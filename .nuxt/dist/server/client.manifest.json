@@ -1,0 +1,18 @@
+{
+  "@vite/client": {
+    "prefetch": true,
+    "isEntry": true,
+    "file": "@vite/client",
+    "css": [],
+    "module": true,
+    "resourceType": "script"
+  },
+  "/media/ma_guy/Work Related/Kyta IT Solutions/kyta-web-portal/node_modules/nuxt/dist/app/entry.js": {
+    "resourceType": "script",
+    "module": true,
+    "prefetch": true,
+    "preload": true,
+    "isEntry": true,
+    "file": "/media/ma_guy/Work Related/Kyta IT Solutions/kyta-web-portal/node_modules/nuxt/dist/app/entry.js"
+  }
+}
