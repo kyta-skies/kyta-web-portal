@@ -1,6 +1,6 @@
 <template>
     <div class="h-screen flex flex-col justify-center items-center gap-8 ">
-      <IconsWifi class="text-[#980E70] text-3xl" />
+      <IconsLoad class="text-[#980E70] text-3xl" />
       <div class="w-full max-w-xs bg-indigo-100 backdrop-filter-backdrop-blur-sm rounded p-5">
         <p v-if="errorMessage" class="text-red-600 text-center">{{ errorMessage }}</p>
         <header>
