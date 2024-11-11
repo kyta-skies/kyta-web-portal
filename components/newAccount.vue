@@ -32,8 +32,6 @@
             Log in
           </NuxtLink>
         </footer>
-   
-     
       </div>
     </div>
   </template>
