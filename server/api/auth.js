@@ -3,7 +3,7 @@ import { defineEventHandler, readBody } from "h3";
 import radius from "radius";
 import dgram from "dgram";
 
-const RADIUS_SERVER = "192.168.1.120";
+const RADIUS_SERVER = "127.0.0.1";
 const RADIUS_SECRET = "testing123";
 const RADIUS_PORT = 1812;
 
