@@ -53,32 +53,87 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'login',
-  data() {
-    return {
-      username: '',
-      password: '',
-      errorMessage: ''
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const username = ref('');
+const password = ref('');
+const message = ref('');
+
+const SESSION_TIMEOUT = 15 * 60 * 1000; // 15 minutes
+let sessionTimeoutTimer = null;
+
+async function handleLogin() {
+  try {
+    const response = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username.value, password: password.value }),
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      message.value = 'Login successful!';
+      
+      // Set session expiration time
+      const expirationTime = Date.now() + SESSION_TIMEOUT;
+      localStorage.setItem('sessionExpiration', expirationTime);
+
+      // Redirect to success page and start session timer
+      router.push('/success');
+      startSessionTimer();
+    } else {
+      message.value = 'Invalid credentials. Please try again.';
     }
-  },
-  methods: {
-    async handleLogin() {
-      try {
-        const response = await this.$axios.post('/api/auth', {
-          username: this.username,
-          password: this.password
-        });
-        if (response.data.success) {
-          window.location.href = response.data.redirectURL;
-        } else {
-          this.errorMessage = 'Authentication failed. Please try again.';
-        }
-      } catch (error) {
-        this.errorMessage = 'An error occurred during login.';
-      }
-    }
-  },
+  } catch (error) {
+    console.error('Error during login:', error);
+    message.value = 'Server error. Please try again later.';
+  }
 }
+
+// Start session timer to check expiration
+function startSessionTimer() {
+  stopSessionTimer(); // Clear any existing timer
+  sessionTimeoutTimer = setInterval(checkSessionExpiration, 1000); // Check every second
+}
+
+// Clear session timer
+function stopSessionTimer() {
+  if (sessionTimeoutTimer) {
+    clearInterval(sessionTimeoutTimer);
+    sessionTimeoutTimer = null;
+  }
+}
+
+// Check if the session is expired
+function checkSessionExpiration() {
+  const expirationTime = localStorage.getItem('sessionExpiration');
+  if (Date.now() > expirationTime) {
+    handleLogout();
+  }
+}
+
+// Logout the user
+function handleLogout() {
+  localStorage.removeItem('sessionExpiration');
+  message.value = 'Session expired. Please log in again.';
+  stopSessionTimer();
+  router.push('/buyData'); // Redirect to buyData page
+}
+
+// Start session timer when the component mounts
+onMounted(() => {
+  const expirationTime = localStorage.getItem('sessionExpiration');
+  if (expirationTime && Date.now() < expirationTime) {
+    startSessionTimer();
+  }
+});
+
+// Clear session timer when the component is unmounted
+onBeforeUnmount(() => {
+  stopSessionTimer();
+});
 </script>
+

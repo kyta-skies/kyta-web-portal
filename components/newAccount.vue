@@ -6,7 +6,7 @@
         <header>
           <h1 class="text-center text-[#980E70] text-lg font-bold">KYTA SKIES</h1>
         </header>
-        <form @submit.prevent="handleLogin">
+        <form @submit.prevent="handleRegister">
           <div>
             <label class="block mb-2 text-[#980E70]" for="username">Username</label>
             <input
@@ -36,32 +36,34 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    name: 'login',
-    data() {
-      return {
-        username: '',
-        password: '',
-        errorMessage: ''
+  <script setup>
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  
+  const username = ref('');
+  const password = ref('');
+  const message = ref('');
+  const router = useRouter(); // Initialize the router instance
+  
+  async function handleRegister() {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username.value, password: password.value }),
+      });
+      const data = await response.json();
+  
+      if (data.success) {
+        message.value = 'Registration successful! You can now log in.';
+        router.push('/login');
+      } else {
+        message.value = data.message || 'Registration failed. Please try again.';
       }
-    },
-    methods: {
-      async handleLogin() {
-        try {
-          const response = await this.$axios.post('/api/auth', {
-            username: this.username,
-            password: this.password
-          });
-          if (response.data.success) {
-            window.location.href = response.data.redirectURL;
-          } else {
-            this.errorMessage = 'Authentication failed. Please try again.';
-          }
-        } catch (error) {
-          this.errorMessage = 'An error occurred during login.';
-        }
-      }
-    },
+    } catch (error) {
+      console.error('Error during registration:', error);
+      message.value = 'Server error. Please try again later.';
+    }
   }
   </script>
+
